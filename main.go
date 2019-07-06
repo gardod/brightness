@@ -41,6 +41,14 @@ func onReady() {
 	listen()
 }
 
+func getIcon(s string) []byte {
+	b, err := ioutil.ReadFile(s)
+	if err != nil {
+		log.Print(err)
+	}
+	return b
+}
+
 func setupControls() {
 	set100 = systray.AddMenuItem("100%", "Set brightness")
 	set90 = systray.AddMenuItem("90%", "Set brightness")
@@ -57,21 +65,17 @@ func setupControls() {
 	exit = systray.AddMenuItem("Exit", "Close application")
 }
 
-func getIcon(s string) []byte {
-	b, err := ioutil.ReadFile(s)
-	if err != nil {
-		log.Print(err)
-	}
-	return b
-}
-
 func setupMonitors() {
 	var err error
 	monitors, err = sysmonitor.GetMonitors()
 	if err != nil {
 		log.Print(err)
 	}
-	// TODO: add monitor names as disabled menu items
+
+	for _, monitor := range monitors {
+		systray.AddMenuItem(monitor.Name, "").Disable()
+	}
+	systray.AddSeparator()
 }
 
 func listen() {
@@ -106,7 +110,7 @@ func listen() {
 	}
 }
 
-func setBrightness(perc int) {
+func setBrightness(perc int64) {
 	for _, monitor := range monitors {
 		monitor.SetBrightness(perc)
 	}

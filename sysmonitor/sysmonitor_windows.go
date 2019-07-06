@@ -16,6 +16,7 @@ var (
 	pGetPhysicalMonitorsFromHMONITOR         = d32.NewProc("GetPhysicalMonitorsFromHMONITOR")
 	pDestroyPhysicalMonitor                  = d32.NewProc("DestroyPhysicalMonitor")
 	pGetMonitorCapabilities                  = d32.NewProc("GetMonitorCapabilities")
+	pGetMonitorBrightness                    = d32.NewProc("GetMonitorBrightness")
 	pSetMonitorBrightness                    = d32.NewProc("SetMonitorBrightness")
 )
 
@@ -85,6 +86,19 @@ func getMonitorCapabilities(hMonitor uintptr, pdwMonitorCapabilities, pdwSupport
 		hMonitor,
 		uintptr(unsafe.Pointer(pdwMonitorCapabilities)),
 		uintptr(unsafe.Pointer(pdwSupportedColorTemperatures)),
+	)
+	if res == 0 {
+		return err
+	}
+	return nil
+}
+
+func getMonitorBrightness(hMonitor uintptr, pdwMinimumBrightness, pdwCurrentBrightness, pdwMaximumBrightness *uint32) error {
+	res, _, err := pGetMonitorBrightness.Call(
+		hMonitor,
+		uintptr(unsafe.Pointer(pdwMinimumBrightness)),
+		uintptr(unsafe.Pointer(pdwCurrentBrightness)),
+		uintptr(unsafe.Pointer(pdwMaximumBrightness)),
 	)
 	if res == 0 {
 		return err
